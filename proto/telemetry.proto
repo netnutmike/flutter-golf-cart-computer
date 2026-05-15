@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option java_package = "com.geeksville.mesh";
+option java_outer_classname = "TelemetryProtos";
+
+/**
+ * Device metrics reported by nodes.
+ */
+message DeviceMetrics {
+  // Battery level (0-100, or 101 for powered)
+  uint32 battery_level = 1;
+  // Voltage in volts
+  float voltage = 2;
+  // Channel utilization percentage
+  float channel_utilization = 3;
+  // Airtime utilization percentage
+  float air_util_tx = 4;
+  // Uptime in seconds
+  uint32 uptime_seconds = 5;
+}
+
+/**
+ * Environment metrics from sensors.
+ */
+message EnvironmentMetrics {
+  // Temperature in Celsius
+  float temperature = 1;
+  // Relative humidity percentage
+  float relative_humidity = 2;
+  // Barometric pressure in hPa
+  float barometric_pressure = 3;
+  // Gas resistance in ohms
+  float gas_resistance = 4;
+  // Voltage (external sensor)
+  float voltage = 5;
+  // Current in mA
+  float current = 6;
+}
+
+/**
+ * Power metrics.
+ */
+message PowerMetrics {
+  float ch1_voltage = 1;
+  float ch1_current = 2;
+  float ch2_voltage = 3;
+  float ch2_current = 4;
+  float ch3_voltage = 5;
+  float ch3_current = 6;
+}
+
+/**
+ * Telemetry message containing device or environment metrics.
+ */
+message Telemetry {
+  // Timestamp when the telemetry was measured
+  fixed32 time = 1;
+
+  oneof variant {
+    DeviceMetrics device_metrics = 2;
+    EnvironmentMetrics environment_metrics = 3;
+    PowerMetrics power_metrics = 4;
+  }
+}

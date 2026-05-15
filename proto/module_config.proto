@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option java_package = "com.geeksville.mesh";
+option java_outer_classname = "ModuleConfigProtos";
+
+/**
+ * Module configuration message.
+ * Contains sub-configurations for optional radio modules.
+ */
+message ModuleConfig {
+  oneof payload_variant {
+    MQTTConfig mqtt = 1;
+    SerialConfig serial = 2;
+    ExternalNotificationConfig external_notification = 3;
+    StoreForwardConfig store_forward = 4;
+    RangeTestConfig range_test = 5;
+    TelemetryConfig telemetry = 6;
+    CannedMessageConfig canned_message = 7;
+    AudioConfig audio = 8;
+    RemoteHardwareConfig remote_hardware = 9;
+  }
+
+  /**
+   * MQTT module configuration.
+   */
+  message MQTTConfig {
+    bool enabled = 1;
+    string address = 2;
+    string username = 3;
+    string password = 4;
+    bool encryption_enabled = 5;
+    bool json_enabled = 6;
+    bool tls_enabled = 7;
+    string root_topic = 8;
+  }
+
+  /**
+   * Serial module configuration.
+   */
+  message SerialConfig {
+    bool enabled = 1;
+    bool echo = 2;
+    uint32 rxd = 3;
+    uint32 txd = 4;
+    enum Serial_Baud {
+      BAUD_DEFAULT = 0;
+      BAUD_110 = 1;
+      BAUD_300 = 2;
+      BAUD_600 = 3;
+      BAUD_1200 = 4;
+      BAUD_2400 = 5;
+      BAUD_4800 = 6;
+      BAUD_9600 = 7;
+      BAUD_19200 = 8;
+      BAUD_38400 = 9;
+      BAUD_57600 = 10;
+      BAUD_115200 = 11;
+      BAUD_230400 = 12;
+      BAUD_460800 = 13;
+      BAUD_576000 = 14;
+      BAUD_921600 = 15;
+    }
+    Serial_Baud baud = 5;
+    uint32 timeout = 6;
+    enum Serial_Mode {
+      DEFAULT = 0;
+      SIMPLE = 1;
+      PROTO = 2;
+      TEXTMSG = 3;
+      NMEA = 4;
+    }
+    Serial_Mode mode = 7;
+  }
+
+  /**
+   * External notification module configuration.
+   */
+  message ExternalNotificationConfig {
+    bool enabled = 1;
+    uint32 output_ms = 2;
+    uint32 output = 3;
+    bool active = 4;
+    bool alert_message = 5;
+    bool alert_bell = 6;
+    bool use_pwm = 7;
+    uint32 nag_timeout = 8;
+  }
+
+  /**
+   * Store and forward module configuration.
+   */
+  message StoreForwardConfig {
+    bool enabled = 1;
+    bool heartbeat = 2;
+    uint32 records = 3;
+    uint32 history_return_max = 4;
+    uint32 history_return_window = 5;
+  }
+
+  /**
+   * Range test module configuration.
+   */
+  message RangeTestConfig {
+    bool enabled = 1;
+    uint32 sender = 2;
+    bool save = 3;
+  }
+
+  /**
+   * Telemetry module configuration.
+   */
+  message TelemetryConfig {
+    uint32 device_update_interval = 1;
+    uint32 environment_update_interval = 2;
+    bool environment_measurement_enabled = 3;
+    bool environment_screen_enabled = 4;
+    bool environment_display_fahrenheit = 5;
+  }
+
+  /**
+   * Canned message module configuration.
+   */
+  message CannedMessageConfig {
+    bool rotary1_enabled = 1;
+    uint32 inputbroker_pin_a = 2;
+    uint32 inputbroker_pin_b = 3;
+    uint32 inputbroker_pin_press = 4;
+    enum InputEventChar {
+      NONE = 0;
+      UP = 17;
+      DOWN = 18;
+      LEFT = 19;
+      RIGHT = 20;
+      SELECT = 10;
+      BACK = 27;
+      CANCEL = 24;
+    }
+    InputEventChar inputbroker_event_cw = 5;
+    InputEventChar inputbroker_event_ccw = 6;
+    InputEventChar inputbroker_event_press = 7;
+    bool updown1_enabled = 8;
+    bool enabled = 9;
+    string allow_input_source = 10;
+    bool send_bell = 11;
+  }
+
+  /**
+   * Audio module configuration.
+   */
+  message AudioConfig {
+    bool codec2_enabled = 1;
+    uint32 ptt_pin = 2;
+    enum Audio_Baud {
+      CODEC2_DEFAULT = 0;
+      CODEC2_3200 = 1;
+      CODEC2_2400 = 2;
+      CODEC2_1600 = 3;
+      CODEC2_1400 = 4;
+      CODEC2_1300 = 5;
+      CODEC2_1200 = 6;
+      CODEC2_700 = 7;
+      CODEC2_700B = 8;
+    }
+    Audio_Baud bitrate = 3;
+    uint32 i2s_ws = 4;
+    uint32 i2s_sd = 5;
+    uint32 i2s_din = 6;
+    uint32 i2s_sck = 7;
+  }
+
+  /**
+   * Remote hardware module configuration.
+   */
+  message RemoteHardwareConfig {
+    bool enabled = 1;
+    bool allow_undefined_pin_access = 2;
+  }
+}

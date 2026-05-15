@@ -45,5 +45,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to communicate with the Meshtastic radio and GCI telemetry computer.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app uses Bluetooth to communicate with the Meshtastic radio and GCI telemetry computer.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location for GPS speed, heading, navigation, and geofence detection.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app uses your location in the background to maintain GPS tracking and geofence detection while driving.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

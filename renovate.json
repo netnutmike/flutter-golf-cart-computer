@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "schedule": [
+    "every weekend"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["pub"],
+      "groupName": "flutter dependencies"
+    }
+  ]
+}

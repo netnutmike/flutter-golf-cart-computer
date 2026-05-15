@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option java_package = "com.geeksville.mesh";
+option java_outer_classname = "AdminProtos";
+
+import "config.proto";
+import "module_config.proto";
+import "channel.proto";
+
+/**
+ * Admin message for radio administration commands.
+ * Sent via ADMIN_APP port (6) to the local node number.
+ */
+message AdminMessage {
+  oneof payload_variant {
+    // Get channel by index
+    uint32 get_channel_request = 1;
+    // Response with channel data
+    Channel get_channel_response = 2;
+
+    // Get owner info
+    bool get_owner_request = 3;
+    // Response with owner info
+    // User get_owner_response = 4;
+
+    // Get config by type
+    AdminMessage.ConfigType get_config_request = 5;
+    // Response with config
+    Config get_config_response = 6;
+
+    // Get module config by type
+    AdminMessage.ModuleConfigType get_module_config_request = 7;
+    // Response with module config
+    ModuleConfig get_module_config_response = 8;
+
+    // Set config
+    Config set_config = 10;
+    // Set module config
+    ModuleConfig set_module_config = 11;
+    // Set channel
+    Channel set_channel = 12;
+
+    // Reboot the radio after specified seconds
+    int32 reboot_seconds = 20;
+    // Reboot into OTA mode
+    int32 reboot_ota_seconds = 21;
+    // Shutdown after specified seconds
+    int32 shutdown_seconds = 22;
+    // Factory reset
+    int32 factory_reset = 23;
+    // Reset node database
+    int32 nodedb_reset = 24;
+  }
+
+  enum ConfigType {
+    DEVICE_CONFIG = 0;
+    POSITION_CONFIG = 1;
+    POWER_CONFIG = 2;
+    NETWORK_CONFIG = 3;
+    DISPLAY_CONFIG = 4;
+    LORA_CONFIG = 5;
+    BLUETOOTH_CONFIG = 6;
+  }
+
+  enum ModuleConfigType {
+    MQTT_CONFIG = 0;
+    SERIAL_CONFIG = 1;
+    EXTNOTIF_CONFIG = 2;
+    STOREFORWARD_CONFIG = 3;
+    RANGETEST_CONFIG = 4;
+    TELEMETRY_CONFIG = 5;
+    CANNEDMSG_CONFIG = 6;
+    AUDIO_CONFIG = 7;
+    REMOTEHARDWARE_CONFIG = 8;
+  }
+}

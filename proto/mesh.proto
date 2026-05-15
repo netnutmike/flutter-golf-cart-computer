@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option java_package = "com.geeksville.mesh";
+option java_outer_classname = "MeshProtos";
+
+import "portnums.proto";
+import "telemetry.proto";
+import "config.proto";
+import "module_config.proto";
+import "channel.proto";
+
+/**
+ * Position data from GPS or other location source.
+ */
+message Position {
+  // Latitude in degrees * 1e-7
+  sfixed32 latitude_i = 1;
+  // Longitude in degrees * 1e-7
+  sfixed32 longitude_i = 2;
+  // Altitude in meters above MSL
+  int32 altitude = 3;
+  // Time the position was received (seconds since 1970)
+  fixed32 time = 4;
+  // Ground speed in km/h
+  uint32 ground_speed = 5;
+  // Ground track in degrees
+  uint32 ground_track = 6;
+  // Number of satellites used in fix
+  uint32 sats_in_view = 7;
+  // Horizontal dilution of precision * 100
+  uint32 precision_bits = 8;
+}
+
+/**
+ * User information for a node.
+ */
+message User {
+  string id = 1;
+  string long_name = 2;
+  string short_name = 3;
+  bytes macaddr = 4;
+  HardwareModel hw_model = 5;
+  bool is_licensed = 6;
+}
+
+enum HardwareModel {
+  UNSET = 0;
+  TLORA_V2 = 1;
+  TLORA_V1 = 2;
+  TLORA_V2_1_1P6 = 3;
+  TBEAM = 4;
+  HELTEC_V2_0 = 5;
+  TBEAM_V0P7 = 6;
+  T_ECHO = 7;
+  TLORA_V1_1P3 = 8;
+  RAK4631 = 9;
+  HELTEC_V2_1 = 10;
+  HELTEC_V1 = 11;
+  LILYGO_TBEAM_S3_CORE = 12;
+  RAK11200 = 13;
+  NANO_G1 = 14;
+  STATION_G1 = 25;
+  LORA_RELAY_V1 = 32;
+  NRF52840DK = 33;
+  PPR = 34;
+  GENIEBLOCKS = 35;
+  NRF52_UNKNOWN = 36;
+  PORTDUINO = 37;
+  ANDROID_SIM = 38;
+  DIY_V1 = 39;
+  NRF52840_PCA10059 = 40;
+  PRIVATE_HW = 255;
+}
+
+/**
+ * The data payload within a MeshPacket.
+ */
+message Data {
+  // Port number for routing
+  PortNum portnum = 1;
+  // The actual payload bytes
+  bytes payload = 2;
+  // Whether the payload needs to be decoded as protobuf
+  bool want_response = 3;
+  // Destination node for response
+  fixed32 dest = 4;
+  // Source node
+  fixed32 source = 5;
+  // Unique ID for deduplication
+  fixed32 request_id = 6;
+  // Reply ID for response matching
+  fixed32 reply_id = 7;
+  // Emoji flag
+  fixed32 emoji = 8;
+}
+
+/**
+ * A mesh network packet.
+ */
+message MeshPacket {
+  // Sender node number
+  fixed32 from = 1;
+  // Destination node number (0xFFFFFFFF for broadcast)
+  fixed32 to = 2;
+  // Channel index
+  uint32 channel = 3;
+
+  oneof payload_variant {
+    Data decoded = 4;
+    bytes encrypted = 5;
+  }
+
+  // Unique packet ID (non-zero, used for deduplication)
+  fixed32 id = 6;
+  // Time packet was received (seconds since 1970)
+  fixed32 rx_time = 7;
+  // Signal-to-noise ratio
+  float rx_snr = 8;
+  // Hop limit
+  uint32 hop_limit = 9;
+  // Whether this packet needs an ACK
+  bool want_ack = 10;
+  // Priority level
+  Priority priority = 11;
+  // Received signal strength indicator
+  int32 rx_rssi = 12;
+
+  enum Priority {
+    UNSET = 0;
+    MIN = 1;
+    BACKGROUND = 10;
+    DEFAULT = 64;
+    RELIABLE = 70;
+    ACK = 120;
+    MAX = 127;
+  }
+}
+
+/**
+ * Information about the local node.
+ */
+message MyNodeInfo {
+  // The node number assigned to this device
+  uint32 my_node_num = 1;
+  // Firmware version string
+  string firmware_version = 2;
+  // Reboot count
+  uint32 reboot_count = 3;
+  // Minimum app version supported
+  uint32 min_app_version = 4;
+}
+
+/**
+ * Node information database entry.
+ */
+message NodeInfo {
+  uint32 num = 1;
+  User user = 2;
+  Position position = 3;
+  float snr = 4;
+  fixed32 last_heard = 5;
+  DeviceMetrics device_metrics = 6;
+}
+
+/**
+ * Wrapper for all messages sent TO the radio.
+ */
+message ToRadio {
+  oneof payload_variant {
+    // Send a mesh packet
+    MeshPacket packet = 1;
+    // Request config from radio (random ID for handshake)
+    uint32 want_config_id = 3;
+    // Disconnect cleanly from radio
+    bool disconnect = 4;
+  }
+}
+
+/**
+ * Wrapper for all messages received FROM the radio.
+ */
+message FromRadio {
+  // Unique ID for this message
+  uint32 id = 1;
+
+  oneof payload_variant {
+    // A received mesh packet
+    MeshPacket packet = 2;
+    // Local node info (during handshake)
+    MyNodeInfo my_info = 3;
+    // Node database entry
+    NodeInfo node_info = 4;
+    // Config data (during handshake)
+    Config config = 5;
+    // Module config data
+    ModuleConfig moduleConfig = 6;
+    // Channel data
+    Channel channel = 7;
+    // Config complete signal (value matches want_config_id)
+    uint32 config_complete_id = 8;
+  }
+}

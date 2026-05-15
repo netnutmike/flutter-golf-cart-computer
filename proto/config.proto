@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option java_package = "com.geeksville.mesh";
+option java_outer_classname = "ConfigProtos";
+
+/**
+ * Radio configuration message.
+ * Contains sub-configurations for different aspects of the radio.
+ */
+message Config {
+  oneof payload_variant {
+    DeviceConfig device = 1;
+    PositionConfig position = 2;
+    PowerConfig power = 3;
+    NetworkConfig network = 4;
+    DisplayConfig display = 5;
+    LoRaConfig lora = 6;
+    BluetoothConfig bluetooth = 7;
+  }
+
+  /**
+   * Device configuration.
+   */
+  message DeviceConfig {
+    enum Role {
+      CLIENT = 0;
+      CLIENT_MUTE = 1;
+      ROUTER = 2;
+      ROUTER_CLIENT = 3;
+    }
+    Role role = 1;
+    bool serial_enabled = 2;
+    bool debug_log_enabled = 3;
+    uint32 button_gpio = 4;
+    uint32 buzzer_gpio = 5;
+  }
+
+  /**
+   * Position/GPS configuration.
+   * Controls how often the radio reports its position.
+   */
+  message PositionConfig {
+    // How often to update position (seconds)
+    uint32 position_broadcast_secs = 1;
+    // Smart position broadcast enabled
+    bool position_broadcast_smart_enabled = 2;
+    // Fixed position mode
+    bool fixed_position = 3;
+    // GPS enabled
+    bool gps_enabled = 4;
+    // GPS update interval in seconds
+    uint32 gps_update_interval = 5;
+    // GPS attempt time in seconds
+    uint32 gps_attempt_time = 6;
+    // Position flags bitmask
+    uint32 position_flags = 7;
+    // Rx GPIO pin for GPS
+    uint32 rx_gpio = 8;
+    // Tx GPIO pin for GPS
+    uint32 tx_gpio = 9;
+    // Broadcast smart minimum distance (meters)
+    uint32 broadcast_smart_minimum_distance = 10;
+    // Broadcast smart minimum interval (seconds)
+    uint32 broadcast_smart_minimum_interval_secs = 11;
+  }
+
+  /**
+   * Power configuration.
+   */
+  message PowerConfig {
+    bool is_power_saving = 1;
+    uint32 on_battery_shutdown_after_secs = 2;
+    float adc_multiplier_override = 3;
+    uint32 wait_bluetooth_secs = 4;
+    uint32 sds_secs = 5;
+    uint32 ls_secs = 6;
+    uint32 min_wake_secs = 7;
+  }
+
+  /**
+   * Network configuration.
+   */
+  message NetworkConfig {
+    bool wifi_enabled = 1;
+    string wifi_ssid = 2;
+    string wifi_psk = 3;
+    string ntp_server = 4;
+  }
+
+  /**
+   * Display configuration.
+   */
+  message DisplayConfig {
+    uint32 screen_on_secs = 1;
+    enum GpsCoordinateFormat {
+      DEC = 0;
+      DMS = 1;
+      UTM = 2;
+      MGRS = 3;
+      OLC = 4;
+      OSGR = 5;
+    }
+    GpsCoordinateFormat gps_format = 2;
+    bool compass_north_top = 3;
+    bool flip_screen = 4;
+    enum DisplayUnits {
+      METRIC = 0;
+      IMPERIAL = 1;
+    }
+    DisplayUnits units = 5;
+  }
+
+  /**
+   * LoRa radio configuration.
+   */
+  message LoRaConfig {
+    uint32 region = 1;
+    bool use_preset = 2;
+    enum ModemPreset {
+      LONG_FAST = 0;
+      LONG_SLOW = 1;
+      VERY_LONG_SLOW = 2;
+      MEDIUM_SLOW = 3;
+      MEDIUM_FAST = 4;
+      SHORT_SLOW = 5;
+      SHORT_FAST = 6;
+    }
+    ModemPreset modem_preset = 3;
+    uint32 bandwidth = 4;
+    uint32 spread_factor = 5;
+    uint32 coding_rate = 6;
+    float frequency_offset = 7;
+    uint32 hop_limit = 8;
+    bool tx_enabled = 9;
+    int32 tx_power = 10;
+    uint32 channel_num = 11;
+  }
+
+  /**
+   * Bluetooth configuration.
+   */
+  message BluetoothConfig {
+    bool enabled = 1;
+    enum PairingMode {
+      RANDOM_PIN = 0;
+      FIXED_PIN = 1;
+      NO_PIN = 2;
+    }
+    PairingMode mode = 2;
+    uint32 fixed_pin = 3;
+  }
+}
