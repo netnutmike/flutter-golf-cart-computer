@@ -570,6 +570,50 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
 - [x] 18. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
+- [x] 19. Responsive layout implementation
+  - [x] 19.1 Implement responsive breakpoint system
+    - Create `lib/presentation/widgets/responsive_layout.dart` with `ResponsiveLayout` widget
+    - Implement breakpoint detection using `LayoutBuilder` and `MediaQuery`: Compact (<800px), Medium (800-1024px), Expanded (>1024px)
+    - Create layout variants for each breakpoint: `CompactDashboardLayout`, `MediumDashboardLayout`, `ExpandedDashboardLayout`
+    - Ensure all primary layout containers use relative sizing (flex factors, percentage-based constraints) rather than fixed pixel dimensions
+    - Implement orientation detection and provide portrait vs landscape layout variants
+    - Verify orientation changes reflow within 500ms without losing application state or interrupting Bluetooth connections
+    - _Requirements: 23.1, 23.2, 23.3, 23.4, 23.5, 23.9, 23.10_
+
+  - [x] 19.2 Adapt MainScreen for responsive layout
+    - Refactor `lib/presentation/screens/main_screen.dart` to use `ResponsiveLayout`
+    - Portrait layout: single-column stack with speed/heading at top, secondary info scrollable below
+    - Landscape layout: side-by-side with speed/heading on one side, telemetry/status on the other
+    - Compact breakpoint: prioritize speed, heading, time, connection status; secondary info scrolls
+    - Medium breakpoint: two-column dashboard with essential info visible
+    - Expanded breakpoint: all widgets visible simultaneously in multi-column arrangement
+    - Ensure all text meets minimum font sizes: 16sp for speed/temperature/time, 12sp for labels/status
+    - Ensure all touch targets maintain minimum 44x44dp at all screen sizes
+    - _Requirements: 23.1, 23.2, 23.3, 23.5, 23.6, 23.7, 23.8, 23.9_
+
+  - [x] 19.3 Adapt secondary screens for responsive layout
+    - Refactor `WeatherScreen` to adapt layout for portrait/landscape and screen size breakpoints
+    - Refactor `EntertainmentScreen` to adapt scrollable table for available space
+    - Refactor `ConfigScreen` to reflow controls for portrait/landscape and smaller screens
+    - Ensure all screens render correctly at 800x600 minimum resolution
+    - Ensure font sizes and touch targets meet minimums on all screens
+    - _Requirements: 23.1, 23.2, 23.3, 23.6, 23.7_
+
+  - [x] 19.4 Write widget tests for responsive behavior
+    - Test MainScreen renders correctly at 800x600 (minimum resolution)
+    - Test MainScreen renders correctly at 1024x768 (medium breakpoint)
+    - Test MainScreen renders correctly at 1920x1080 (expanded)
+    - Test MainScreen adapts between portrait and landscape orientations
+    - Test all text meets minimum font size requirements (12sp informational, 16sp primary)
+    - Test all interactive elements maintain 44x44dp minimum touch targets
+    - Test WeatherScreen, EntertainmentScreen, and ConfigScreen at minimum resolution
+    - Test orientation change does not lose application state
+    - Test priority-based content display on screens smaller than 1024x768
+    - _Requirements: 23.1, 23.2, 23.3, 23.6, 23.7, 23.8, 23.9, 23.10_
+
+- [x] 20. Final verification - Responsive layout
+  - Ensure all responsive layout tests pass and screens render correctly at 800x600 minimum. Ask the user if questions arise.
+
 ## Notes
 
 - All tasks are required
@@ -605,7 +649,10 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     { "id": 15, "tasks": ["16.1", "16.2", "16.3", "16.4", "16.5"] },
     { "id": 16, "tasks": ["16.6", "17.1"] },
     { "id": 17, "tasks": ["17.2"] },
-    { "id": 18, "tasks": ["17.3"] }
+    { "id": 18, "tasks": ["17.3"] },
+    { "id": 19, "tasks": ["19.1"] },
+    { "id": 20, "tasks": ["19.2", "19.3"] },
+    { "id": 21, "tasks": ["19.4"] }
   ]
 }
 ```

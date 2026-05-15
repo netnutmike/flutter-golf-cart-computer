@@ -5,9 +5,13 @@
 /// odometer, trip odometer, driving hours, sunrise/sunset times,
 /// and service-due indicator.
 ///
+/// Uses [ResponsiveLayout] to adapt between compact, medium, and expanded
+/// breakpoints, and between portrait and landscape orientations.
+///
 /// Requirements: 13.1, 13.6, 13.9, 13.12, 13.13, 13.14, 13.15,
 ///   5.3, 5.8, 5.9, 5.10, 5.13, 5.14, 5.17, 5.18, 6.3, 7.6, 7.10,
-///   8.3, 8.4, 8.5, 8.6
+///   8.3, 8.4, 8.5, 8.6,
+///   23.1, 23.2, 23.3, 23.5, 23.6, 23.7, 23.8, 23.9
 library;
 
 import 'package:flutter/material.dart';
@@ -18,11 +22,28 @@ import '../../application/config_notifier.dart';
 import '../../application/main_notifier.dart';
 import '../../application/providers.dart';
 import '../../domain/models/user_preferences.dart';
+import '../widgets/responsive_layout.dart';
+
+/// Minimum font size for primary data displays (speed, temperature, time).
+/// Requirement 23.6: 16sp minimum for primary data.
+const double _kPrimaryFontSize = 16.0;
+
+/// Minimum font size for labels and status text.
+/// Requirement 23.6: 12sp minimum for informational text.
+const double _kLabelFontSize = 12.0;
+
+/// Minimum touch target size in density-independent pixels.
+/// Requirement 23.7: 44x44dp minimum touch targets.
+const double _kMinTouchTarget = 44.0;
 
 /// Main screen widget displaying all primary dashboard information.
 ///
 /// Uses Riverpod [ConsumerWidget] to reactively rebuild when
 /// [MainScreenState], [DualConnectionState], or [ConfigState] changes.
+///
+/// Requirement 23.2: Responsive layout system that dynamically adjusts
+/// widget sizes, spacing, and arrangement based on available screen dimensions.
+/// Requirement 23.3: Supports both portrait and landscape orientations.
 class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
@@ -39,25 +60,10 @@ class MainScreen extends ConsumerWidget {
     final body = SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            // Top row: connection indicators and navigation
-            _TopBar(
-              connectionState: connectionState,
-              isServiceDue: state.isServiceDue,
-            ),
-            const SizedBox(height: 8),
-            // Main content area
-            Expanded(
-              child: _DashboardContent(
-                state: state,
-                preferences: preferences,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Bottom navigation row
-            const _BottomNavBar(),
-          ],
+        child: _ResponsiveMainContent(
+          state: state,
+          connectionState: connectionState,
+          preferences: preferences,
         ),
       ),
     );
@@ -66,6 +72,270 @@ class MainScreen extends ConsumerWidget {
     return RotatedBox(
       quarterTurns: flipScreen ? 2 : 0,
       child: body,
+    );
+  }
+}
+
+/// Responsive main content that adapts layout based on breakpoint and
+/// orientation using [ResponsiveLayout].
+///
+/// Requirement 23.2: Dynamically adjusts widget sizes, spacing, and
+/// arrangement based on available screen dimensions.
+/// Requirement 23.9: Adapts between single-column (portrait/narrow) and
+/// multi-column (landscape/wider) arrangements.
+class _ResponsiveMainContent extends StatelessWidget {
+  const _ResponsiveMainContent({
+    required this.state,
+    required this.connectionState,
+    required this.preferences,
+  });
+
+  final MainScreenState state;
+  final DualConnectionState connectionState;
+  final UserPreferences preferences;
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveLayout.oriented(
+      // Portrait fallback: single-column stack
+      portraitBuilder: _buildCompactPortrait,
+      // Landscape fallback: side-by-side
+      landscapeBuilder: _buildCompactLandscape,
+      // Compact breakpoint (< 800px)
+      compactPortraitBuilder: _buildCompactPortrait,
+      compactLandscapeBuilder: _buildCompactLandscape,
+      // Medium breakpoint (800-1024px)
+      mediumPortraitBuilder: _buildMediumPortrait,
+      mediumLandscapeBuilder: _buildMediumLandscape,
+      // Expanded breakpoint (> 1024px)
+      expandedPortraitBuilder: _buildExpanded,
+      expandedLandscapeBuilder: _buildExpanded,
+    );
+  }
+
+  /// Compact portrait: single-column stack with speed/heading at top,
+  /// secondary info scrollable below.
+  ///
+  /// Requirement 23.8: Prioritize speed, heading, time, connection status.
+  /// Requirement 23.9: Single-column arrangement for narrow/portrait screens.
+  Widget _buildCompactPortrait(
+    BuildContext context,
+    ResponsiveLayoutData layoutData,
+  ) {
+    return CompactDashboardLayout(
+      primaryContent: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _TopBar(
+            connectionState: connectionState,
+            isServiceDue: state.isServiceDue,
+          ),
+          const SizedBox(height: 8),
+          _SpeedHeadingRow(state: state),
+          const SizedBox(height: 8),
+          _TimeDateRow(state: state),
+        ],
+      ),
+      secondaryContent: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          _TelemetryGrid(state: state),
+          const SizedBox(height: 12),
+          _OdometerRow(state: state),
+          const SizedBox(height: 12),
+          _SunTimesRow(state: state),
+        ],
+      ),
+      bottomNavigation: const _BottomNavBar(),
+    );
+  }
+
+  /// Compact landscape: side-by-side with speed/heading on one side,
+  /// telemetry/status on the other.
+  ///
+  /// Requirement 23.3: Landscape orientation adaptation.
+  /// Requirement 23.8: Prioritize essential dashboard information.
+  Widget _buildCompactLandscape(
+    BuildContext context,
+    ResponsiveLayoutData layoutData,
+  ) {
+    return Column(
+      children: [
+        _TopBar(
+          connectionState: connectionState,
+          isServiceDue: state.isServiceDue,
+        ),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left side: speed, heading, time
+              Expanded(
+                flex: 50,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 8),
+                      _SpeedHeadingRow(state: state),
+                      const SizedBox(height: 8),
+                      _TimeDateRow(state: state),
+                      const SizedBox(height: 8),
+                      _SunTimesRow(state: state),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Right side: telemetry, odometer
+              Expanded(
+                flex: 50,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 8),
+                      _TelemetryGrid(state: state),
+                      const SizedBox(height: 12),
+                      _OdometerRow(state: state),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const _BottomNavBar(),
+      ],
+    );
+  }
+
+  /// Medium portrait: two-column dashboard with essential info visible.
+  ///
+  /// Requirement 23.9: Multi-column arrangement for wider screens.
+  Widget _buildMediumPortrait(
+    BuildContext context,
+    ResponsiveLayoutData layoutData,
+  ) {
+    return MediumDashboardLayout(
+      leftColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TopBar(
+              connectionState: connectionState,
+              isServiceDue: state.isServiceDue,
+            ),
+            const SizedBox(height: 8),
+            _SpeedHeadingRow(state: state),
+            const SizedBox(height: 12),
+            _TimeDateRow(state: state),
+            const SizedBox(height: 12),
+            _SunTimesRow(state: state),
+          ],
+        ),
+      ),
+      rightColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            _TelemetryGrid(state: state),
+            const SizedBox(height: 12),
+            _OdometerRow(state: state),
+          ],
+        ),
+      ),
+      bottomNavigation: const _BottomNavBar(),
+    );
+  }
+
+  /// Medium landscape: two-column with speed/heading on left,
+  /// telemetry/status on right.
+  ///
+  /// Requirement 23.3: Landscape orientation adaptation.
+  Widget _buildMediumLandscape(
+    BuildContext context,
+    ResponsiveLayoutData layoutData,
+  ) {
+    return MediumDashboardLayout(
+      leftColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TopBar(
+              connectionState: connectionState,
+              isServiceDue: state.isServiceDue,
+            ),
+            const SizedBox(height: 8),
+            _SpeedHeadingRow(state: state),
+            const SizedBox(height: 12),
+            _TimeDateRow(state: state),
+          ],
+        ),
+      ),
+      rightColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            _TelemetryGrid(state: state),
+            const SizedBox(height: 12),
+            _OdometerRow(state: state),
+            const SizedBox(height: 12),
+            _SunTimesRow(state: state),
+          ],
+        ),
+      ),
+      bottomNavigation: const _BottomNavBar(),
+    );
+  }
+
+  /// Expanded: all widgets visible simultaneously in multi-column arrangement.
+  ///
+  /// Requirement 23.9: Multi-column arrangement for wider/landscape screens.
+  Widget _buildExpanded(
+    BuildContext context,
+    ResponsiveLayoutData layoutData,
+  ) {
+    return ExpandedDashboardLayout(
+      leftColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TopBar(
+              connectionState: connectionState,
+              isServiceDue: state.isServiceDue,
+            ),
+            const SizedBox(height: 8),
+            _SpeedHeadingRow(state: state),
+            const SizedBox(height: 12),
+            _TimeDateRow(state: state),
+          ],
+        ),
+      ),
+      centerColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            _TelemetryGrid(state: state),
+          ],
+        ),
+      ),
+      rightColumn: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            _OdometerRow(state: state),
+            const SizedBox(height: 12),
+            _SunTimesRow(state: state),
+          ],
+        ),
+      ),
+      bottomNavigation: const _BottomNavBar(),
     );
   }
 }
@@ -120,6 +390,7 @@ class _TopBar extends StatelessWidget {
 /// Connection status indicator with colored icon.
 ///
 /// Requirement 13.6: Three distinct visual states.
+/// Requirement 23.7: Touch targets minimum 44x44dp.
 class _ConnectionIndicator extends StatelessWidget {
   const _ConnectionIndicator({
     required this.label,
@@ -136,69 +407,38 @@ class _ConnectionIndicator extends StatelessWidget {
     final (Color color, IconData icon) = switch (status) {
       ConnectionStatus.connected => (Colors.green, Icons.bluetooth_connected),
       ConnectionStatus.connecting => (Colors.orange, Icons.bluetooth_searching),
-      ConnectionStatus.reconnecting => (Colors.orange, Icons.bluetooth_searching),
+      ConnectionStatus.reconnecting =>
+        (Colors.orange, Icons.bluetooth_searching),
       ConnectionStatus.disconnected => (
         theme.colorScheme.onSurfaceVariant,
         Icons.bluetooth_disabled,
       ),
     };
 
-    // Requirement 13.15: Touch targets minimum 48x48 dp.
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: Tooltip(
-        message: '$label: ${status.name}',
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 20),
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(color: color),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Main dashboard content displaying all data widgets.
-class _DashboardContent extends StatelessWidget {
-  const _DashboardContent({
-    required this.state,
-    required this.preferences,
-  });
-
-  final MainScreenState state;
-  final UserPreferences preferences;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
+    // Requirement 23.7: Touch targets minimum 44x44dp.
+    return Tooltip(
+      message: '$label: ${status.name}',
+      child: SizedBox(
+        width: _kMinTouchTarget,
+        height: _kMinTouchTarget,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Speed and heading (primary display)
-              _SpeedHeadingRow(state: state),
-              const SizedBox(height: 12),
-              // Time and date
-              _TimeDateRow(state: state),
-              const SizedBox(height: 12),
-              // Telemetry data grid
-              _TelemetryGrid(state: state),
-              const SizedBox(height: 12),
-              // Odometer and hours
-              _OdometerRow(state: state),
-              const SizedBox(height: 12),
-              // Sunrise/sunset
-              _SunTimesRow(state: state),
+              Icon(icon, color: color, size: 20),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontSize: _kLabelFontSize,
+                ),
+              ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -207,6 +447,8 @@ class _DashboardContent extends StatelessWidget {
 ///
 /// Requirement 5.3: Display speed as integer mph.
 /// Requirement 5.8: Display heading as 16-point cardinal direction.
+/// Requirement 23.6: Minimum 16sp for speed display.
+/// Requirement 23.5: Uses relative sizing via FittedBox.
 class _SpeedHeadingRow extends StatelessWidget {
   const _SpeedHeadingRow({required this.state});
 
@@ -220,50 +462,68 @@ class _SpeedHeadingRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Speed display
-        // Requirement 13.15: Touch targets minimum 48x48 dp.
-        SizedBox(
-          width: 120,
-          height: 80,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${state.speedMph}',
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+        // Requirement 23.7: Touch targets minimum 44x44dp.
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: _kMinTouchTarget,
+            minHeight: _kMinTouchTarget,
+          ),
+          child: SizedBox(
+            width: 120,
+            height: 80,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${state.speedMph}',
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: _kPrimaryFontSize * 3,
+                    ),
                   ),
-                ),
-                Text(
-                  'MPH',
-                  style: theme.textTheme.labelMedium,
-                ),
-              ],
+                  Text(
+                    'MPH',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontSize: _kLabelFontSize,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         const SizedBox(width: 24),
         // Heading display
-        SizedBox(
-          width: 80,
-          height: 80,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  state.cardinalDirection,
-                  style: theme.textTheme.displayMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: _kMinTouchTarget,
+            minHeight: _kMinTouchTarget,
+          ),
+          child: SizedBox(
+            width: 80,
+            height: 80,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    state.cardinalDirection,
+                    style: theme.textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: _kPrimaryFontSize * 2,
+                    ),
                   ),
-                ),
-                Text(
-                  'HDG',
-                  style: theme.textTheme.labelMedium,
-                ),
-              ],
+                  Text(
+                    'HDG',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontSize: _kLabelFontSize,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -276,6 +536,7 @@ class _SpeedHeadingRow extends StatelessWidget {
 ///
 /// Requirement 5.13: Display date in "Mon, Jan 15" format.
 /// Requirement 5.14: Display time in 12-hour AM/PM format.
+/// Requirement 23.6: Minimum 16sp for time display.
 /// Displays "NO GPS" when applicable (Requirement 5.16).
 class _TimeDateRow extends StatelessWidget {
   const _TimeDateRow({required this.state});
@@ -290,23 +551,30 @@ class _TimeDateRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Time
-        // Requirement 13.15: Touch targets minimum 48x48 dp.
-        SizedBox(
-          height: 48,
+        // Requirement 23.7: Touch targets minimum 44x44dp.
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: _kMinTouchTarget,
+          ),
           child: Center(
             child: Text(
               state.timeString,
-              style: theme.textTheme.headlineSmall,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: _kPrimaryFontSize,
+              ),
             ),
           ),
         ),
         // Date (shows "NO GPS" when no GPS fix)
-        SizedBox(
-          height: 48,
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: _kMinTouchTarget,
+          ),
           child: Center(
             child: Text(
               state.dateString,
               style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: _kPrimaryFontSize,
                 color: state.dateString == 'NO GPS'
                     ? theme.colorScheme.error
                     : null,
@@ -442,7 +710,7 @@ class _SunTimesRow extends StatelessWidget {
 /// Bottom navigation bar for accessing weather, entertainment, and config.
 ///
 /// Requirement 13.14: All screens reachable within 2 taps from main display.
-/// Requirement 13.15: Touch targets minimum 48x48 dp.
+/// Requirement 23.7: Touch targets minimum 44x44dp.
 class _BottomNavBar extends StatelessWidget {
   const _BottomNavBar();
 
@@ -488,7 +756,7 @@ class _BottomNavBar extends StatelessWidget {
 
 /// Navigation button with icon and label.
 ///
-/// Requirement 13.15: Touch targets minimum 48x48 dp.
+/// Requirement 23.7: Touch targets minimum 44x44dp.
 class _NavButton extends StatelessWidget {
   const _NavButton({
     required this.icon,
@@ -509,8 +777,12 @@ class _NavButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
+        // Requirement 23.7: Touch targets minimum 44x44dp.
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 80, minHeight: 56),
+          constraints: const BoxConstraints(
+            minWidth: 80,
+            minHeight: _kMinTouchTarget + 12,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -521,6 +793,7 @@ class _NavButton extends StatelessWidget {
                 label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
+                  fontSize: _kLabelFontSize,
                 ),
               ),
             ],
@@ -533,7 +806,8 @@ class _NavButton extends StatelessWidget {
 
 /// Reusable data widget for displaying a value with icon and label.
 ///
-/// Requirement 13.15: Touch targets minimum 48x48 dp.
+/// Requirement 23.7: Touch targets minimum 44x44dp.
+/// Requirement 23.6: Minimum 16sp for primary data, 12sp for labels.
 class _DataWidget extends StatelessWidget {
   const _DataWidget({
     required this.icon,
@@ -549,39 +823,47 @@ class _DataWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Requirement 13.15: Minimum 48x48 dp touch targets.
-    return SizedBox(
-      width: 96,
-      height: 56,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: theme.colorScheme.primary),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+    // Requirement 23.7: Minimum 44x44dp touch targets.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: _kMinTouchTarget,
+        minHeight: _kMinTouchTarget,
+      ),
+      child: SizedBox(
+        width: 96,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16, color: theme.colorScheme.primary),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    value,
+                    // Requirement 23.6: 16sp minimum for primary data.
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: _kPrimaryFontSize,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              ],
             ),
-          ),
-        ],
+            Text(
+              label,
+              // Requirement 23.6: 12sp minimum for labels.
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: _kLabelFontSize,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-

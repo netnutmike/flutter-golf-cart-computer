@@ -810,6 +810,82 @@ class GciCommandPayload {
 
 **Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5**
 
+## Responsive Layout System
+
+The presentation layer implements a responsive design system that adapts to different screen sizes and orientations, supporting resolutions as low as 800x600 pixels.
+
+### Breakpoint System
+
+| Breakpoint | Width | Layout Strategy |
+|-----------|-------|-----------------|
+| Compact | < 800px | Single column, stacked widgets, scrollable overflow |
+| Medium | 800-1024px | Two-column dashboard, essential info prioritized |
+| Expanded | > 1024px | Multi-column with all widgets visible simultaneously |
+
+### Layout Implementation
+
+```dart
+class ResponsiveLayout extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          return CompactDashboardLayout();
+        } else if (constraints.maxWidth < 1024) {
+          return MediumDashboardLayout();
+        } else {
+          return ExpandedDashboardLayout();
+        }
+      },
+    );
+  }
+}
+```
+
+### Orientation Handling
+
+- **Portrait (vertical):** Single-column stack with speed/heading prominent at top, secondary info below in scrollable area
+- **Landscape (horizontal):** Side-by-side layout with speed/heading on one side, telemetry/status on the other
+- Orientation changes trigger layout rebuild within 500ms without losing application state
+- Bluetooth connections and data streams are unaffected by orientation changes (state lives in providers, not widgets)
+
+### Sizing Strategy
+
+- Primary layout containers use relative sizing (flex factors, percentage-based constraints) rather than fixed pixel dimensions
+- `MediaQuery` provides device dimensions and orientation for top-level layout decisions
+- `LayoutBuilder` wraps major screen sections to respond to actual available space
+- Flex widgets (Row, Column, Wrap) with flex factors ensure proportional sizing
+
+### Typography Constraints
+
+| Text Category | Minimum Size | Usage |
+|--------------|-------------|-------|
+| Primary data | 16sp | Speed, temperature, time |
+| Secondary data | 14sp | Heading, voltage, fuel, coordinates |
+| Informational | 12sp | Labels, timestamps, status text |
+
+Font sizes scale proportionally with screen size above the minimum, using `MediaQuery.textScaleFactor` and custom scaling logic.
+
+### Touch Target Constraints
+
+All interactive elements maintain a minimum hit area of 44x44 density-independent pixels regardless of screen size or orientation. This is enforced via `ConstrainedBox` or `SizedBox` wrappers on interactive widgets.
+
+### Priority-Based Content Display
+
+On screens smaller than 1024x768:
+- **Always visible:** Speed, heading, time, connection status indicators
+- **Scrollable/navigable:** Telemetry details, coordinates, satellite info, odometer, service hours
+- **Accessible via navigation:** Weather, entertainment, configuration (already on separate screens)
+
+### Widget Tests for Responsive Behavior
+
+Widget tests verify layout correctness at multiple resolutions:
+- 800x600 (minimum supported)
+- 1024x768 (medium breakpoint)
+- 1920x1080 (expanded)
+- Both portrait and landscape orientations at each size
+
 ## Error Handling
 
 ### Bluetooth Errors
