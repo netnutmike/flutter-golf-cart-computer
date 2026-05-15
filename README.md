@@ -1,6 +1,5 @@
 # Flutter Golf Cart Computer
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Flutter](https://img.shields.io/badge/Flutter-3.22%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.9%2B-0175C2?logo=dart)](https://dart.dev)
 [![Build](https://github.com/mikemyers/flutter-golf-cart-computer/actions/workflows/ci.yml/badge.svg)](https://github.com/mikemyers/flutter-golf-cart-computer/actions/workflows/ci.yml)
@@ -120,8 +119,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards, branch naming conve
 
 ## Changelog
 
-See [CHANGES.md](CHANGES.md) for a history of notable changes.
-
-## License
-
-This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details.
+See [CHANGELOG.md](CHANGELOG.md) for a history of notable changes.

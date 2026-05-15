@@ -6,7 +6,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
 
 ## Tasks
 
-- [ ] 1. Project scaffolding and repository setup
+- [x] 1. Project scaffolding and repository setup
   - [x] 1.1 Create Flutter project structure with four-layer architecture
     - Initialize Flutter project with `flutter create` targeting Android and iOS
     - Create directory layout: `lib/presentation/`, `lib/application/`, `lib/domain/`, `lib/data/`
@@ -31,10 +31,10 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Verify generated classes compile without errors
     - _Requirements: 16.4, 16.16, 18.10, 18.11_
 
-  - [ ] 1.4 Set up repository documentation and CI
+  - [x] 1.4 Set up repository documentation and CI
     - Create `README.md` with project overview, setup instructions, architecture summary, platform build notes, badges, and docs links
     - Create `CONTRIBUTING.md` with coding standards, branch naming, PR process
-    - Create `CHANGES.md` with initial `[Unreleased]` section
+    - Create `CHANGELOG.md` with initial `[Unreleased]` section
     - Add GPL-3.0 `LICENSE` file
     - Create `.github/dependabot.yml` with weekly schedule
     - Create `renovate.json` for automated dependency updates
@@ -52,19 +52,19 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Each file must contain minimum 200 words of substantive content
     - _Requirements: 22.1, 22.2, 22.3, 22.4, 22.5, 22.6, 22.7, 22.8, 22.9, 22.10, 22.11_
 
-  - [ ] 1.6 Set up test infrastructure
+  - [x] 1.6 Set up test infrastructure
     - Create test directory structure: `test/unit/domain/`, `test/unit/data/`, `test/property/`, `test/widget/`, `test/integration/`
     - Create a test helper file with common utilities and mock setup
     - Verify `flutter analyze` passes with zero errors
     - Verify `flutter test` runs without build failures
     - _Requirements: 16.17, 16.19_
 
-- [ ] 2. Checkpoint - Verify project scaffolding
+- [x] 2. Checkpoint - Verify project scaffolding
   - Ensure `flutter analyze` passes with zero errors and `flutter test` executes without build failures. Ask the user if questions arise.
 
 
-- [ ] 3. Data layer - Core models and utilities
-  - [ ] 3.1 Define domain models
+- [x] 3. Data layer - Core models and utilities
+  - [x] 3.1 Define domain models
     - Create `lib/domain/models/gps_data.dart` with `ProcessedGpsData`, `NavigationData`, `RawPosition`
     - Create `lib/domain/models/weather_data.dart` with `WeatherData`, `HourForecast`
     - Create `lib/domain/models/entertainment_data.dart` with `VenueEvent`, `EntertainmentData`
@@ -78,7 +78,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Create `lib/domain/models/gci_message.dart` with `GciMessage`, `GciMessageType`, `GciTelemetryPayload`, `GciGpsPayload`, `GciCommandPayload`
     - _Requirements: 5.3, 5.8, 5.9, 6.3, 8.2, 9.3, 10.3, 11.1, 15.9_
 
-  - [ ] 3.2 Implement PacketFramer
+  - [x] 3.2 Implement PacketFramer
     - Create `lib/data/services/packet_framer.dart`
     - Implement `frame()`: prepend 4-byte big-endian length prefix to payload
     - Implement `unframe()`: read length prefix, extract payload; return null if buffer too short or length exceeds available bytes
@@ -86,21 +86,21 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Handle edge cases: empty payload, maximum size (65535 bytes), framed data < 4 bytes
     - _Requirements: 18.2, 18.3, 18.4_
 
-  - [ ] 3.3 Write property test for PacketFramer round-trip
+  - [x] 3.3 Write property test for PacketFramer round-trip
     - **Property 2: Packet framing round-trip**
     - Test that for any byte array (0 to 65535 bytes), frame then unframe produces the original
     - Test that framed data < 4 bytes returns null from unframe
     - Test that length prefix exceeding buffer returns null
     - **Validates: Requirements 18.2**
 
-  - [ ] 3.4 Write unit tests for PacketFramer
+  - [x] 3.4 Write unit tests for PacketFramer
     - Test frame/unframe with known byte arrays
     - Test splitForMtu with various MTU sizes (20, 128, 512)
     - Test edge cases: empty payload, single byte, max size
     - _Requirements: 18.2, 18.3, 18.4_
 
-- [ ] 4. Data layer - Persistence
-  - [ ] 4.1 Implement PreferencesRepository
+- [x] 4. Data layer - Persistence
+  - [x] 4.1 Implement PreferencesRepository
     - Create `lib/data/repositories/preferences_repository.dart` with abstract class and implementation
     - Implement `loadPreferences()` with defaults for missing/corrupted values
     - Implement `savePreference()` with 2-second debounce for slider/spinner values
@@ -109,20 +109,20 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Apply default values from Requirements 15.9
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.6, 15.7, 15.8, 15.9_
 
-  - [ ] 4.2 Implement CacheRepository
+  - [x] 4.2 Implement CacheRepository
     - Create `lib/data/repositories/cache_repository.dart` with abstract class and implementation using Hive
     - Implement `cacheWeatherData()` and `cacheVenueData()` with raw packet, timestamp, and YYYYMMDD date
     - Implement `loadCachedWeather()` and `loadCachedVenue()`
     - Implement `clearStaleCache()` comparing stored date against current date
     - _Requirements: 15.5, 19.1, 19.2, 19.3, 19.4, 19.5_
 
-  - [ ] 4.3 Write property test for cache date validation
+  - [x] 4.3 Write property test for cache date validation
     - **Property 10: Cache date validation**
     - Test that cached data is restored if and only if stored date equals current date
     - Test that mismatched dates result in stale cache discard
     - **Validates: Requirements 3.7, 3.8, 4.9, 4.10, 19.3, 19.4, 19.5**
 
-  - [ ] 4.4 Write unit tests for PreferencesRepository and CacheRepository
+  - [x] 4.4 Write unit tests for PreferencesRepository and CacheRepository
     - Test loading defaults when no data exists
     - Test debounce behavior for rapid writes
     - Test reset preserves operational data
@@ -130,8 +130,8 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - _Requirements: 15.3, 15.4, 15.8_
 
 
-- [ ] 5. Data layer - Bluetooth and GPS services
-  - [ ] 5.1 Implement MeshtasticService
+- [x] 5. Data layer - Bluetooth and GPS services
+  - [x] 5.1 Implement MeshtasticService
     - Create `lib/data/services/meshtastic_service.dart` with abstract class and BLE implementation
     - Implement device scanning with name pattern `^.*_([0-9a-fA-F]{4})$` and 10-second timeout
     - Implement BLE connection with service UUID `6ba1b218-15a8-461f-9fa8-5dcae273eafd`
@@ -146,7 +146,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Persist bonded device identifier for auto-reconnection
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.16, 1.17, 18.1, 18.4, 18.5, 18.6, 18.7, 18.8, 18.9_
 
-  - [ ] 5.2 Write property tests for Meshtastic message handling
+  - [x] 5.2 Write property tests for Meshtastic message handling
     - **Property 1: Protobuf serialization round-trip**
     - **Validates: Requirements 1.5, 1.6**
     - **Property 3: Message routing acceptance**
@@ -156,7 +156,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - **Property 5: Outbound payload size enforcement**
     - **Validates: Requirements 2.7**
 
-  - [ ] 5.3 Implement TelemetryService
+  - [x] 5.3 Implement TelemetryService
     - Create `lib/data/services/telemetry_service.dart` with abstract class and implementation
     - Implement GCI message envelope: type(1) + timestamp(4 LE) + seq_num(2 LE) + data_len(2 LE) + data
     - Implement telemetry data parsing: 20-byte LE payload (modeLights, outdoorLum, airTemp, battVolts, fuel)
@@ -170,7 +170,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Platform-specific: BLE on iOS, Bluetooth Classic SPP preferred on Android with BLE fallback
     - _Requirements: 8.1, 8.2, 8.7, 8.8, 8.9, 8.10, 8.11, 8.12, 8.13, 8.14, 8.15, 8.16, 8.17, 17.7, 17.8_
 
-  - [ ] 5.4 Write unit tests for TelemetryService message parsing
+  - [x] 5.4 Write unit tests for TelemetryService message parsing
     - Test 20-byte LE telemetry payload decoding with known values
     - Test GCI message envelope construction and parsing
     - Test heartbeat timing and timeout detection
@@ -178,7 +178,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test packets < 20 bytes are discarded
     - _Requirements: 8.2, 8.7, 8.8, 8.9, 8.17_
 
-  - [ ] 5.5 Implement LocationService
+  - [x] 5.5 Implement LocationService
     - Create `lib/data/services/location_service.dart` with abstract class and geolocator implementation
     - Implement `positionStream` with 1-second update interval via `Geolocator.getPositionStream()`
     - Implement `currentPosition` getter
@@ -187,19 +187,19 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Configure background location for iOS via background modes
     - _Requirements: 5.1, 5.20, 20.8_
 
-  - [ ] 5.6 Implement BackgroundService
+  - [x] 5.6 Implement BackgroundService
     - Create `lib/data/services/background_service.dart` with abstract class and platform channel implementation
     - Android: Implement foreground service start/stop with persistent notification via platform channel
     - iOS: Leverage declared background modes (bluetooth-central, location)
     - Implement `isRunningInBackground` stream
     - _Requirements: 20.1, 20.2, 20.3, 20.7_
 
-- [ ] 6. Checkpoint - Verify data layer services compile
+- [x] 6. Checkpoint - Verify data layer services compile
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 7. Domain layer - GPS and speed processing
-  - [ ] 7.1 Implement SpeedFilter
+- [x] 7. Domain layer - GPS and speed processing
+  - [x] 7.1 Implement SpeedFilter
     - Create `lib/domain/speed_filter.dart`
     - Implement dither elimination: speeds below 2.5 mph → zero
     - Implement spike rejection: discard readings exceeding 8 mph/s acceleration
@@ -209,7 +209,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Return `FilterResult` with filteredSpeedMph, isMoving, wasDiscarded
     - _Requirements: 5.4, 5.5, 5.6, 5.7_
 
-  - [ ] 7.2 Write property test for GPS speed filtering pipeline
+  - [x] 7.2 Write property test for GPS speed filtering pipeline
     - **Property 11: GPS speed filtering pipeline**
     - Test dither elimination (raw < 2.5 → 0)
     - Test spike rejection (> 8 mph/s acceleration discarded)
@@ -217,7 +217,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test consecutive reading threshold (2 normal, 3 dimmed)
     - **Validates: Requirements 5.4, 5.5, 5.6, 5.7**
 
-  - [ ] 7.3 Implement GpsProcessor
+  - [x] 7.3 Implement GpsProcessor
     - Create `lib/domain/gps_processor.dart`
     - Integrate SpeedFilter for speed processing
     - Implement heading conversion: bearing degrees → 16-point cardinal direction (22.5° intervals)
@@ -229,7 +229,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Emit `ProcessedGpsData` and `NavigationData` streams
     - _Requirements: 5.1, 5.2, 5.3, 5.8, 5.9, 5.10, 5.11, 5.12, 5.15, 5.16, 5.17, 5.18, 5.19_
 
-  - [ ] 7.4 Write property tests for GPS navigation calculations
+  - [x] 7.4 Write property tests for GPS navigation calculations
     - **Property 12: Cardinal direction mapping**
     - Test 16-point mapping with 22.5° intervals for all bearings [0, 360)
     - **Validates: Requirements 5.8**
@@ -240,8 +240,8 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test estimation rules: ≥6→1.5, 4-5→2.0, <4→99.0
     - **Validates: Requirements 5.12**
 
-- [ ] 8. Domain layer - Distance and time tracking
-  - [ ] 8.1 Implement OdometerManager
+- [x] 8. Domain layer - Distance and time tracking
+  - [x] 8.1 Implement OdometerManager
     - Create `lib/domain/odometer_manager.dart`
     - Implement distance accumulation with Doppler speed gating (only when filtered speed > 0)
     - Implement minimum distance threshold: 2.6 feet (0.0005 miles) with Doppler, 10 feet (0.002 miles) without
@@ -252,7 +252,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Wire to PreferencesRepository for persist/load
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13_
 
-  - [ ] 8.2 Write property tests for odometer
+  - [x] 8.2 Write property tests for odometer
     - **Property 15: Distance accumulation gating**
     - Test distance only accumulates when speed > 0, position change exceeds threshold, implied speed ≤ 30 mph
     - **Validates: Requirements 6.4, 6.5, 6.6, 6.7**
@@ -260,7 +260,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test trip reset doesn't affect total, rollover at 100,000 and 10,000, total = sum of segments mod 100,000
     - **Validates: Requirements 6.1, 6.2, 6.8, 6.13**
 
-  - [ ] 8.3 Implement ServiceReminderManager
+  - [x] 8.3 Implement ServiceReminderManager
     - Create `lib/domain/service_reminder_manager.dart`
     - Implement time accumulation: only when speed > 0
     - Implement time delta validation: accept only > 0 and ≤ 10 seconds
@@ -271,15 +271,15 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Wire to PreferencesRepository for persist/load
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10_
 
-  - [ ] 8.4 Write property test for driving hours accumulation
+  - [x] 8.4 Write property test for driving hours accumulation
     - **Property 17: Driving hours accumulation gating**
     - Test hours only accumulate when speed > 0 AND delta > 0 AND delta ≤ 10 seconds
     - Test deltas outside range are discarded
     - **Validates: Requirements 7.1, 7.5**
 
 
-- [ ] 9. Domain layer - Packet parsing
-  - [ ] 9.1 Implement HotPacketParser
+- [x] 9. Domain layer - Packet parsing
+  - [x] 9.1 Implement HotPacketParser
     - Create `lib/domain/hot_packet_parser.dart`
     - Implement `isHotPacket()`: check leading `|` character
     - Implement `parsePacketType()`: extract type code after `|#`
@@ -291,7 +291,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Log diagnostic messages for validation failures
     - _Requirements: 3.1, 3.2, 3.3, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14, 4.1, 4.2, 4.3, 4.4, 4.6_
 
-  - [ ] 9.2 Write property tests for weather packet validation and parsing
+  - [x] 9.2 Write property tests for weather packet validation and parsing
     - **Property 6: Weather packet structural validation**
     - Test acceptance iff starts with `|#01#`, has 7 `#` and 12 `,`, valid temps/hours/precip/glyphs
     - **Validates: Requirements 3.2, 3.9, 3.10, 3.11, 3.13, 3.14**
@@ -302,14 +302,14 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test `0.0` → empty string, other values preserved
     - **Validates: Requirements 3.12**
 
-  - [ ] 9.3 Write property test for venue/event packet parsing
+  - [x] 9.3 Write property test for venue/event packet parsing
     - **Property 9: Venue/event packet parsing**
     - Test valid packets produce correct VenueEvent list with venue = text before first comma, event = text after
     - Test list length equals number of valid pairs (up to 12)
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.6**
 
-- [ ] 10. Domain layer - System managers
-  - [ ] 10.1 Implement GeofenceManager
+- [x] 10. Domain layer - System managers
+  - [x] 10.1 Implement GeofenceManager
     - Create `lib/domain/geofence_manager.dart`
     - Implement distance calculation from current position to home using Haversine formula
     - Implement hysteresis: entering home at radius - 50m, leaving at radius + 50m
@@ -319,13 +319,13 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Emit `GeofenceState` stream on each position update
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 9.10_
 
-  - [ ] 10.2 Write property test for geofence hysteresis
+  - [x] 10.2 Write property test for geofence hysteresis
     - **Property 18: Geofence status determination with hysteresis**
     - Test `at_home` transitions true only at radius - 50m, false only at radius + 50m
     - Test no oscillation within hysteresis band
     - **Validates: Requirements 9.4, 9.5, 9.6**
 
-  - [ ] 10.3 Implement SleepManager
+  - [x] 10.3 Implement SleepManager
     - Create `lib/domain/sleep_manager.dart`
     - Implement three-state machine: STARTUP_GRACE, GCI_MODE, STANDALONE_MODE
     - STARTUP_GRACE → GCI_MODE when GCI connects
@@ -336,12 +336,12 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Emit `OperatingMode` stream
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-  - [ ] 10.4 Write property test for sleep state machine
+  - [x] 10.4 Write property test for sleep state machine
     - **Property 20: Sleep state machine transitions**
     - Test all valid transitions and verify no invalid transitions are possible
     - **Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5**
 
-  - [ ] 10.5 Implement BrightnessManager
+  - [x] 10.5 Implement BrightnessManager
     - Create `lib/domain/brightness_manager.dart`
     - Implement day/night brightness selection based on current time vs sunrise/sunset
     - Implement inactivity timeout dimming (0-60 minutes, default 5)
@@ -352,12 +352,12 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Use platform channels for native screen brightness control
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9_
 
-  - [ ] 10.6 Write property test for brightness level selection
+  - [x] 10.6 Write property test for brightness level selection
     - **Property 19: Brightness level selection**
     - Test day brightness between sunrise and sunset, night brightness otherwise
     - **Validates: Requirements 10.1, 10.2**
 
-  - [ ] 10.7 Implement AudioService
+  - [x] 10.7 Implement AudioService
     - Create `lib/domain/audio_service.dart`
     - Implement distinct tones: startup, message notification, alert, confirmation, click, error
     - Implement volume control (0-20 integer steps)
@@ -365,19 +365,19 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Use audioplayers or just_audio plugin for cross-platform playback
     - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 14.10, 14.11_
 
-- [ ] 11. Checkpoint - Verify domain layer
+- [x] 11. Checkpoint - Verify domain layer
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Application layer - Riverpod providers and notifiers
-  - [ ] 12.1 Set up Riverpod provider definitions
+- [x] 12. Application layer - Riverpod providers and notifiers
+  - [x] 12.1 Set up Riverpod provider definitions
     - Create `lib/application/providers.dart` with all provider definitions organized by layer
     - Data providers: `meshtasticServiceProvider`, `telemetryServiceProvider`, `locationServiceProvider`, `preferencesRepositoryProvider`, `cacheRepositoryProvider`, `backgroundServiceProvider`
     - Domain providers: `gpsProcessorProvider`, `odometerManagerProvider`, `serviceReminderProvider`, `hotPacketParserProvider`, `sleepManagerProvider`, `brightnessManagerProvider`, `geofenceManagerProvider`, `audioServiceProvider`, `speedFilterProvider`
     - Application providers: `mainNotifierProvider`, `weatherNotifierProvider`, `entertainmentNotifierProvider`, `configNotifierProvider`, `connectionNotifierProvider`
     - _Requirements: 16.2_
 
-  - [ ] 12.2 Implement ConnectionNotifier
+  - [x] 12.2 Implement ConnectionNotifier
     - Create `lib/application/connection_notifier.dart`
     - Manage independent connection state for Meshtastic and GCI
     - Expose connection states: Disconnected, Connecting, Connected, Reconnecting
@@ -387,7 +387,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Send stale cache request (`~#01#GC#REQ_WX_ENT#`) when cache is outdated
     - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5, 2.8, 3.8_
 
-  - [ ] 12.3 Implement MainNotifier
+  - [x] 12.3 Implement MainNotifier
     - Create `lib/application/main_notifier.dart`
     - Subscribe to GpsProcessor for speed, heading, coordinates, satellite/HDOP, date/time, sunrise/sunset
     - Subscribe to OdometerManager for distance values
@@ -402,7 +402,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Trigger odometer/hours persistence before sleep/shutdown
     - _Requirements: 5.3, 5.8, 5.9, 5.10, 5.13, 5.14, 5.17, 5.18, 6.3, 7.6, 8.3, 8.4, 8.5, 8.6, 8.13, 8.14, 9.5, 9.6, 11.6, 11.7, 12.4, 12.8_
 
-  - [ ] 12.4 Implement WeatherNotifier
+  - [x] 12.4 Implement WeatherNotifier
     - Create `lib/application/weather_notifier.dart`
     - Subscribe to MeshtasticService incoming packets for HoT weather packets
     - Use HotPacketParser to parse weather data
@@ -414,7 +414,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Manage "new data received" indicator with 5-second auto-clear
     - _Requirements: 3.1, 3.4, 3.5, 3.6, 3.7, 3.8, 13.10, 13.11, 14.3, 19.1, 19.3, 19.4, 19.5, 19.6, 19.7_
 
-  - [ ] 12.5 Implement EntertainmentNotifier
+  - [x] 12.5 Implement EntertainmentNotifier
     - Create `lib/application/entertainment_notifier.dart`
     - Subscribe to MeshtasticService incoming packets for HoT venue/event packets
     - Use HotPacketParser to parse venue/event data
@@ -427,7 +427,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Refresh display within 1 second when new data arrives on active screen
     - _Requirements: 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 13.10, 13.11, 14.3, 19.2, 19.3, 19.4, 19.5, 19.6, 19.7_
 
-  - [ ] 12.6 Implement ConfigNotifier
+  - [x] 12.6 Implement ConfigNotifier
     - Create `lib/application/config_notifier.dart`
     - Expose all user preferences with getters and setters
     - Implement preference changes with 2-second debounce for sliders/spinners
@@ -442,8 +442,8 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Play confirmation/error tones for user actions
     - _Requirements: 9.1, 9.2, 9.8, 13.5, 13.7, 13.8, 15.3, 15.4, 12.7, 11.8, 7.9, 6.2, 14.4, 14.6_
 
-- [ ] 13. Application layer - Messaging and admin
-  - [ ] 13.1 Implement Meshtastic messaging logic in ConnectionNotifier
+- [x] 13. Application layer - Messaging and admin
+  - [x] 13.1 Implement Meshtastic messaging logic in ConnectionNotifier
     - Support sending text messages to broadcast on channels 0-7
     - Support sending direct messages to specific node numbers
     - Support preformatted message selection (up to 20 entries)
@@ -455,7 +455,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Play notification tone on message receipt (if volume > 0)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.9, 2.10, 2.11, 2.12_
 
-  - [ ] 13.2 Implement Meshtastic radio administration
+  - [x] 13.2 Implement Meshtastic radio administration
     - Implement reboot command with 5-second delay and confirmation prompt
     - Implement GPS interval configuration (read-modify-write pattern on PositionConfig)
     - Implement admin command encoding with ADMIN_APP port to local node number
@@ -463,8 +463,8 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Display connected radio node ID in hex format
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.9_
 
-- [ ] 14. Application layer - Permission handling
-  - [ ] 14.1 Implement cross-platform permission management
+- [x] 14. Application layer - Permission handling
+  - [x] 14.1 Implement cross-platform permission management
     - Create `lib/application/permission_manager.dart`
     - Use `permission_handler` package for unified permission management
     - Request permissions at point of first use (not at startup)
@@ -475,12 +475,12 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Detect permission state changes when app returns to foreground
     - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5, 21.6, 21.7, 21.10, 21.11_
 
-- [ ] 15. Checkpoint - Verify application layer
+- [x] 15. Checkpoint - Verify application layer
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 16. Presentation layer - Screens and widgets
-  - [ ] 16.1 Implement MainScreen widget
+- [x] 16. Presentation layer - Screens and widgets
+  - [x] 16.1 Implement MainScreen widget
     - Create `lib/presentation/screens/main_screen.dart`
     - Display widgets: speed (integer mph), heading (16-point cardinal), time (12-hour AM/PM), date ("Mon, Jan 15")
     - Display: temperature (integer °F with offset), satellite/HDOP ("8/1.50"), connection status indicators
@@ -494,7 +494,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Material Design 3 theming
     - _Requirements: 13.1, 13.6, 13.9, 13.12, 13.13, 13.14, 13.15, 5.3, 5.8, 5.9, 5.10, 5.13, 5.14, 5.17, 5.18, 6.3, 7.6, 7.10, 8.3, 8.4, 8.5, 8.6_
 
-  - [ ] 16.2 Implement WeatherScreen widget
+  - [x] 16.2 Implement WeatherScreen widget
     - Create `lib/presentation/screens/weather_screen.dart`
     - Display current temperature prominently
     - Display 4-hour forecast: hour label, weather glyph icon, temperature, precipitation
@@ -504,7 +504,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Handle empty state when no weather data available
     - _Requirements: 3.4, 3.5, 13.2, 13.10, 13.11, 19.4, 19.6_
 
-  - [ ] 16.3 Implement EntertainmentScreen widget
+  - [x] 16.3 Implement EntertainmentScreen widget
     - Create `lib/presentation/screens/entertainment_screen.dart`
     - Display scrollable two-column table: venue names (col 1), event names (col 2)
     - Display up to 12 venue/event entries
@@ -514,7 +514,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Handle empty state when no venue data available
     - _Requirements: 4.5, 4.6, 4.7, 13.3, 13.10, 13.11, 19.4, 19.6_
 
-  - [ ] 16.4 Implement ConfigScreen widget
+  - [x] 16.4 Implement ConfigScreen widget
     - Create `lib/presentation/screens/config_screen.dart`
     - Controls: day brightness slider (0-10), night brightness slider (0-10), speaker volume slider (0-20)
     - Controls: screen flip toggle, backlight timeout spinner (0-60 min), temperature offset spinner (-20 to +20)
@@ -527,13 +527,13 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Accessible via single tap/swipe from main display
     - _Requirements: 13.4, 13.5, 13.7, 13.8, 12.1, 12.2, 12.7, 11.8_
 
-  - [ ] 16.5 Implement connection status indicators
+  - [x] 16.5 Implement connection status indicators
     - Create reusable connection indicator widgets for Meshtastic and GCI
     - Display three distinct visual states: connected, disconnected, connecting/reconnecting
     - Independent indicators for each connection
     - _Requirements: 13.6, 17.2, 17.5_
 
-  - [ ] 16.6 Write widget tests for all screens
+  - [x] 16.6 Write widget tests for all screens
     - Test MainScreen renders all widgets with correct data
     - Test WeatherScreen displays 4-hour forecast correctly
     - Test EntertainmentScreen displays scrollable venue/event table
@@ -542,8 +542,8 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Test screen rotation/flip works
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.6_
 
-- [ ] 17. Integration and wiring
-  - [ ] 17.1 Wire app entry point and navigation
+- [x] 17. Integration and wiring
+  - [x] 17.1 Wire app entry point and navigation
     - Create `lib/main.dart` with ProviderScope and MaterialApp
     - Implement navigation between main, weather, entertainment, and config screens
     - Initialize preferences loading before dependent components
@@ -552,7 +552,7 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Configure screen brightness on startup based on loaded preferences
     - _Requirements: 13.14, 14.1, 15.2, 11.7, 20.4_
 
-  - [ ] 17.2 Wire background connectivity and lifecycle
+  - [x] 17.2 Wire background connectivity and lifecycle
     - Start foreground service on Android when app launches
     - Maintain BLE connections when backgrounded
     - Continue processing messages and telemetry in background
@@ -560,14 +560,14 @@ This implementation plan builds the Flutter Golf Cart Computer application from 
     - Reconnect within 5 seconds if OS terminated connections
     - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5, 20.6_
 
-  - [ ] 17.3 Write integration tests
+  - [x] 17.3 Write integration tests
     - Test BLE connection lifecycle with mock peripheral
     - Test dual Bluetooth independence (one failure doesn't affect other)
     - Test persistence round-trip (shared_preferences and hive)
     - Test permission flow with denied permissions
     - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.9_
 
-- [ ] 18. Final checkpoint - Ensure all tests pass
+- [x] 18. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

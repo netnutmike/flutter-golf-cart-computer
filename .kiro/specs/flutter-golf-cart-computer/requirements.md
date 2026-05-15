@@ -341,7 +341,7 @@ The Flutter app must handle two simultaneous Bluetooth connections: one to the M
 4. THE Repository SHALL include protobuf code generation using the `protoc` compiler with the Dart plugin, with a documented build script or Makefile target that generates Dart classes from Meshtastic `.proto` definition files stored in a `proto/` directory
 5. THE Repository SHALL include a root README.md containing the following sections: project overview, setup instructions, architecture summary, platform-specific build notes, GitHub badges (license, language, build status, Flutter version), and references to detailed documentation in a `docs/` folder
 6. THE Repository SHALL include a CONTRIBUTING.md with coding standards, branch naming conventions, PR process, and development setup instructions
-7. THE Repository SHALL include a CHANGES.md changelog following Keep a Changelog format with an initial `[Unreleased]` section
+7. THE Repository SHALL include a CHANGELOG.md changelog following Keep a Changelog format with an initial `[Unreleased]` section
 8. THE Repository SHALL include a GNU General Public License v3 (GPL-3.0) license file
 9. THE Repository SHALL follow semantic versioning (MAJOR.MINOR.PATCH) starting at version 0.1.0
 10. THE Repository SHALL include a `.gitignore` file covering Flutter/Dart generated files, IDE files, build outputs, and platform-specific artifacts
@@ -453,3 +453,21 @@ The Flutter app must handle two simultaneous Bluetooth connections: one to the M
 9. THE root README.md SHALL include a documentation section containing a relative markdown link to each file in the docs folder accompanied by a one-sentence description of its contents
 10. WHEN any documentation file listed in criteria 2 through 8 is added to the repository, THE file SHALL contain a minimum of 200 words of substantive content (excluding markdown formatting characters and blank lines)
 11. THE root README.md documentation section SHALL contain only valid relative markdown links that resolve to existing files in the docs folder
+
+
+### Requirement 23: Responsive Layout and Screen Adaptability
+
+**User Story:** As a golf cart operator, I want the application to adapt to different screen sizes and orientations, so that it works well on a variety of devices including smaller screens and both portrait and landscape mounting positions.
+
+#### Acceptance Criteria
+
+1. THE GCD SHALL support screen resolutions as low as 800x600 pixels, ensuring all UI elements remain visible, readable, and functional at this minimum resolution
+2. THE GCD SHALL implement a responsive layout system that dynamically adjusts widget sizes, spacing, and arrangement based on the available screen dimensions
+3. THE GCD SHALL support both portrait (vertical) and landscape (horizontal) device orientations, adapting the layout to make optimal use of the available space in each orientation
+4. WHEN the device orientation changes, THE GCD SHALL reflow the UI layout within 500 milliseconds without losing application state or interrupting active Bluetooth connections
+5. THE GCD SHALL use relative sizing (percentages, flex factors, or MediaQuery-based calculations) rather than fixed pixel dimensions for primary layout containers to ensure proportional scaling across screen sizes
+6. THE GCD SHALL ensure that all text remains legible at the minimum supported resolution (800x600), using a minimum effective font size of 12sp for informational text and 16sp for primary data displays (speed, temperature, time)
+7. THE GCD SHALL ensure that all interactive touch targets maintain a minimum size of 44x44 density-independent pixels regardless of screen size or orientation
+8. WHEN displayed on screens smaller than 1024x768, THE GCD SHALL prioritize essential dashboard information (speed, heading, time, connection status) and allow secondary information to scroll or be accessed via navigation
+9. THE GCD SHALL adapt the main dashboard layout between a single-column arrangement for narrow/portrait screens and a multi-column arrangement for wider/landscape screens
+10. THE GCD SHALL use Flutter's LayoutBuilder, MediaQuery, and/or responsive breakpoint utilities to implement adaptive layouts that respond to the actual rendered area rather than assuming a fixed screen size

@@ -13,6 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project dependencies: flutter_riverpod, flutter_blue_plus, geolocator, protobuf, shared_preferences, hive, permission_handler, audioplayers
 - Platform configuration for Android (Bluetooth/Location permissions) and iOS (background modes)
 - Protobuf code generation setup with Meshtastic .proto files
-- Repository documentation (README, CONTRIBUTING, LICENSE)
+- Repository documentation (README, CONTRIBUTING)
 - GitHub Actions CI workflow
 - Dependabot and Renovate configuration for automated dependency updates
